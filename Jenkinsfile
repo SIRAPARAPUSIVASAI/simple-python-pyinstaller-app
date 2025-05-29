@@ -34,7 +34,7 @@ pipeline {
             }
 
             steps {
-                withSonarQubeEnv('sonarserver'){
+                withSonarQubeEnv('SonarServer'){
                     sh '''$SONAR_HOME/bin/sonar-scanner \
                         -Dsonar.projectKey=APP \
                         -Dsonar.projectName=pyinstallerapp \
