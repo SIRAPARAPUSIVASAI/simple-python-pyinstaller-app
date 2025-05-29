@@ -52,8 +52,36 @@ pipeline {
                 }
             }
           }
+           stage('Upload Python Artifact to Nexus Raw Repo') {
+                steps {
+                    script {
+                        def version = '13'
+                        def projectName = 'python-app'
+                        def artifactFile = "${projectName}-${version}.tar.gz"
+                        def groupPath = 'com/example/python-app'
+                        def nexusUrl = 'http://nexus:8081'
+                        def repository = 'python-app'
+                        def credentialsId = 'nexus-creds'
+
+                        // Compress project source
+                        sh "tar -czf ${artifactFile} sources/*.py"
+
+                        // Get credentials from Jenkins (username and password)
+                        withCredentials([usernamePassword(credentialsId: credentialsId, usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                            def uploadUrl = "${nexusUrl}/repository/${repository}/${groupPath}/${version}/${artifactFile}"
+                            
+                            // Upload using curl
+                            sh """
+                                curl -u $NEXUS_USER:$NEXUS_PASS --upload-file ${artifactFile} ${uploadUrl}
+                            """
+                        }
+                    }
+                }
+           }
     }
 }
+
+
 
 
     
